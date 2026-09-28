@@ -88,21 +88,17 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 }
 
 /* ── Navbar System ── */
-#brand-mark{--brand-y:-10px;--brand-scale:.92;position:fixed;top:10px;left:20px;z-index:510;width:92px;height:auto;opacity:0;transform:translate3d(0,var(--brand-y),0) scale(var(--brand-scale));will-change:transform,opacity,filter;transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.34,1.56,.64,1),filter .4s ease}
-#brand-mark.in{--brand-y:0px;--brand-scale:1;opacity:1}
-#brand-logo{display:block;width:100%;height:auto;object-fit:contain}
-@media(hover:hover) and (pointer:fine){
-  #brand-mark:hover{transform:translateY(-2px) scale(1.04);filter:drop-shadow(0 2px 9px rgba(242,169,59,.24))}
-}
-#nav{position:fixed;left:0;right:0;z-index:500;top:46px;will-change:transform,opacity;transform:translateY(0) scale(1);opacity:1;transition:transform .52s cubic-bezier(.16,1.32,.28,1),opacity .38s cubic-bezier(.16,1,.3,1)}
+#nav{position:fixed;left:0;right:0;z-index:500;top:0;will-change:transform,opacity;transform:translateY(0) scale(1);opacity:1;transition:transform .52s cubic-bezier(.16,1.32,.28,1),opacity .38s cubic-bezier(.16,1,.3,1)}
 #nav.nav-hidden{transform:translateY(-120%) scale(.98);opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.32,0,.67,0),opacity .38s cubic-bezier(.32,0,.67,0)}
 #nav.nav-init{transform:translateY(-30px) scale(.97)!important;opacity:0!important}
-.nv-i{background:rgba(12,22,38,.45);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-radius:999px;box-shadow:0 4px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.08);transition:background .4s cubic-bezier(.22,1,.36,1),border-color .4s cubic-bezier(.22,1,.36,1),box-shadow .4s cubic-bezier(.22,1,.36,1),backdrop-filter .4s cubic-bezier(.22,1,.36,1)}
+.nv-i{background:rgba(12,22,38,.45);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-radius:999px;box-shadow:0 4px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.08);transition:background .4s cubic-bezier(.22,1,.36,1),border-color .4s cubic-bezier(.22,1,.36,1),box-shadow .4s cubic-bezier(.22,1,.36,1),backdrop-filter .4s cubic-bezier(.22,1,.36,1);min-height:62px;display:grid;grid-template-columns:88px minmax(0,1fr) auto;align-items:center}
 .nv-i.sc{background:rgba(8,16,29,.82);border-color:rgba(255,255,255,.16);backdrop-filter:blur(24px) saturate(190%);-webkit-backdrop-filter:blur(24px) saturate(190%);box-shadow:0 16px 40px -8px rgba(0,0,0,.65),0 0 0 1px rgba(242,169,59,.09),inset 0 1px 0 rgba(255,255,255,.12)}
 .nv-stag{opacity:0;transform:translateY(-8px);transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1.25,.3,1)}
 .nv-stag.in{opacity:1;transform:none}
 /* ── Navigation Links & Moving Spring Indicator ── */
-#nav-links{position:relative;display:flex;align-items:center}
+#nav-brand{display:flex;align-items:center;justify-content:flex-start;width:70px;height:auto;cursor:none}
+#nav-brand img{display:block;width:70px;height:auto;object-fit:contain}
+#nav-links{position:relative;display:flex;align-items:center;justify-content:center;min-width:0}
 .nl-item{position:relative;z-index:2;color:var(--mut);font-weight:500;padding:6px 12px;cursor:none;text-decoration:none;transition:color .22s cubic-bezier(.22,1,.36,1),opacity .4s ease;user-select:none}
 @media(pointer:coarse){.nl-item{cursor:auto}}
 .nl-item.active,.nl-item:hover{color:#fff}
@@ -118,7 +114,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 #nav-cta.nv-stag{opacity:0;transform:scale(.9) translateY(-4px)}
 #nav-cta.nv-stag.in{opacity:1;transform:scale(1) translateY(0)}
 @media(hover:hover) and (pointer:fine){#nav-cta:hover{transform:translateY(-2px) scale(1.04)!important;box-shadow:0 8px 24px rgba(242,169,59,.48),0 0 0 1px rgba(242,169,59,.3)!important}}
-@media(max-width:640px){#brand-mark{top:8px;left:14px;width:70px}#nav{top:40px;transition:transform .44s cubic-bezier(.16,1.32,.28,1),opacity .3s ease}#nav.nav-hidden{transition:transform .34s cubic-bezier(.32,0,.67,0),opacity .3s ease}}
+@media(max-width:640px){#nav{transition:transform .44s cubic-bezier(.16,1.32,.28,1),opacity .3s ease}.nv-i{min-height:58px;grid-template-columns:68px minmax(0,1fr) auto;padding-left:16px;padding-right:12px}.nv-i #nav-brand,.nv-i #nav-brand img{width:58px}.nv-i .absolute{right:12px}.nv-i .theme-toggle{display:none}#nav.nav-hidden{transition:transform .34s cubic-bezier(.32,0,.67,0),opacity .3s ease}}
 
 /* Reveal */
 .rv{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
@@ -223,6 +219,339 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 .dev-li-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform .35s cubic-bezier(.22,1,.36,1),background .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease;flex-shrink:0;cursor:pointer}
 .dev-card:hover .dev-li-btn,.dev-li-btn:hover{background:rgba(242,169,59,.18);border-color:rgba(242,169,59,.65);color:#f2a93b;transform:translateY(-2px) scale(1.08);box-shadow:0 0 18px rgba(242,169,59,.45)}
 
+/* ── Theme Global Transitions ── */
+body, #nav .nv-i, .card, .glass, .btn-g, #spb, .fit, .tpill, .shr, footer, .dev-card, .nl-item, #brand-mark {
+  transition: background-color .4s cubic-bezier(.22,1,.36,1),
+              border-color .4s cubic-bezier(.22,1,.36,1),
+              color .4s cubic-bezier(.22,1,.36,1),
+              box-shadow .4s cubic-bezier(.22,1,.36,1),
+              backdrop-filter .4s cubic-bezier(.22,1,.36,1);
+}
+
+/* ── Light Mode Core Variables & Overrides ── */
+html[data-theme="light"] {
+  --bg: #f6f7f9;
+  --tx: #111827;
+  --mut: #64748b;
+  --acc: #f2a93b;
+  --gl: rgba(255, 255, 255, 0.78);
+  --gl2: rgba(255, 255, 255, 0.95);
+  --bd: rgba(0, 0, 0, 0.08);
+  --bd2: rgba(0, 0, 0, 0.16);
+  color-scheme: light;
+}
+
+html[data-theme="light"] body {
+  background: var(--bg);
+  color: var(--tx);
+}
+
+/* ── Light Mode Background Layers ── */
+.bg-light-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  opacity: 0;
+  pointer-events: none;
+  background-color: #f6f7f9;
+  transition: opacity .5s cubic-bezier(.22,1,.36,1);
+}
+html[data-theme="light"] .bg-light-layer {
+  opacity: 1;
+}
+html[data-theme="light"] .bg-img,
+html[data-theme="light"] .bg-overlay,
+html[data-theme="light"] .gbg {
+  opacity: 0!important;
+}
+.bg-light-amber {
+  position: absolute;
+  top: -12%;
+  left: 8%;
+  width: 720px;
+  height: 720px;
+  background: radial-gradient(circle, rgba(242,169,59,0.065) 0%, transparent 68%);
+  pointer-events: none;
+}
+.bg-light-steel {
+  position: absolute;
+  top: 36%;
+  right: 4%;
+  width: 820px;
+  height: 820px;
+  background: radial-gradient(circle, rgba(122,162,199,0.085) 0%, transparent 70%);
+  pointer-events: none;
+}
+.bg-light-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(100,116,139,0.045) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(100,116,139,0.045) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(circle at 50% 36%, #000 35%, transparent 85%);
+  pointer-events: none;
+}
+.bg-light-network {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ── Navbar & Links in Light Mode ── */
+html[data-theme="light"] .nv-i {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(17, 24, 39, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+html[data-theme="light"] .nv-i.sc {
+  background: rgba(246, 247, 249, 0.92);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16px 40px -8px rgba(17, 24, 39, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+html[data-theme="light"] .nl-item {
+  color: #64748b;
+}
+html[data-theme="light"] .nl-item.active,
+html[data-theme="light"] .nl-item:hover {
+  color: #111827;
+}
+html[data-theme="light"] #nav-hover-bg {
+  background: radial-gradient(ellipse at center, rgba(242, 169, 59, 0.14) 0%, rgba(0, 0, 0, 0.04) 55%, transparent 100%), rgba(0, 0, 0, 0.025);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Floating brand mark logo in Light Mode */
+html[data-theme="light"] #brand-mark {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 18px rgba(17, 24, 39, 0.06);
+  border-radius: 999px;
+  padding: 4px 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Light Mode Glass & Cards ── */
+html[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+html[data-theme="light"] .card:hover {
+  border-color: rgba(242, 169, 59, 0.45);
+  background: #ffffff;
+  box-shadow: 0 20px 42px -10px rgba(17, 24, 39, 0.11), 0 0 0 1px rgba(242, 169, 59, 0.25);
+}
+html[data-theme="light"] .btn-g {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #111827;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04);
+}
+html[data-theme="light"] .btn-g:hover {
+  background: #ffffff;
+  border-color: rgba(242, 169, 59, 0.5);
+  box-shadow: 0 6px 20px rgba(17, 24, 39, 0.08);
+}
+html[data-theme="light"] #cta-h:hover {
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.1)!important;
+}
+
+/* Comparison table in light mode */
+html[data-theme="light"] .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.07)!important;
+}
+html[data-theme="light"] .border-white\/15 {
+  border-color: rgba(0, 0, 0, 0.09)!important;
+}
+html[data-theme="light"] .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.035)!important;
+}
+
+/* SHAP bars in light mode */
+html[data-theme="light"] .shr .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.06)!important;
+}
+
+/* Developers section cards in light mode */
+html[data-theme="light"] .dev-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
+}
+html[data-theme="light"] .dev-placeholder {
+  background: radial-gradient(circle at 50% 36%, #ffffff 0%, #edf2f7 55%, #e2e8f0 100%);
+}
+html[data-theme="light"] .dev-monogram {
+  background: linear-gradient(135deg, #1e293b 0%, #475569 50%, #f2a93b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+}
+html[data-theme="light"] .dev-overlay {
+  background: linear-gradient(to top, rgba(246, 247, 249, 0.94) 0%, rgba(246, 247, 249, 0.55) 36%, rgba(246, 247, 249, 0.08) 65%, transparent 100%);
+}
+html[data-theme="light"] .dev-name {
+  color: #111827;
+}
+html[data-theme="light"] .dev-card:hover .dev-name {
+  color: #0f172a;
+  text-shadow: none;
+}
+html[data-theme="light"] .dev-li-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #334155;
+  box-shadow: 0 2px 6px rgba(17, 24, 39, 0.06);
+}
+html[data-theme="light"] .dev-card:hover .dev-li-btn,
+html[data-theme="light"] .dev-li-btn:hover {
+  background: rgba(242, 169, 59, 0.16);
+  border-color: rgba(242, 169, 59, 0.6);
+  color: #d97706;
+}
+
+/* Footer in light mode */
+html[data-theme="light"] footer {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html[data-theme="light"] footer .text-white {
+  color: #111827;
+}
+html[data-theme="light"] #io {
+  background: #f6f7f9;
+}
+
+/* ── Theme Toggle Pill Control ── */
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .25s ease, opacity .4s ease;
+}
+@media(hover:hover) and (pointer:fine){
+  .theme-toggle:hover {
+    transform: scale(1.05);
+  }
+}
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+.theme-toggle-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 52px;
+  height: 28px;
+  border-radius: 999px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background .4s cubic-bezier(.22,1,.36,1),
+              border-color .4s cubic-bezier(.22,1,.36,1),
+              box-shadow .4s cubic-bezier(.22,1,.36,1);
+}
+html[data-theme="light"] .theme-toggle-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.09);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  /* Dark mode default: positioned on Moon (right side) */
+  transform: translateX(24px);
+  /* Spring transition: stiffness 400, damping 28, mass 0.6 */
+  transition: transform .38s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background .35s ease,
+              border-color .35s ease,
+              box-shadow .35s ease;
+}
+html[data-theme="light"] .theme-toggle-thumb {
+  /* Light mode: positioned on Sun (left side) */
+  transform: translateX(0px);
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.14), 0 1px 2px rgba(17, 24, 39, 0.06);
+}
+.theme-toggle-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+  transition: opacity .32s ease,
+              transform .38s cubic-bezier(0.34, 1.56, 0.64, 1),
+              color .32s ease;
+}
+/* Sun icon: inactive in dark mode, active in light mode */
+.theme-toggle-sun {
+  opacity: 0.38;
+  transform: scale(0.85) rotate(-15deg);
+  color: var(--mut);
+}
+html[data-theme="light"] .theme-toggle-sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  color: #f2a93b;
+}
+/* Moon icon: active in dark mode, inactive in light mode */
+.theme-toggle-moon {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  color: #f2a93b;
+}
+html[data-theme="light"] .theme-toggle-moon {
+  opacity: 0.38;
+  transform: scale(0.85) rotate(15deg);
+  color: #64748b;
+}
+
+@media(max-width: 640px) {
+  .theme-toggle-track {
+    width: 48px;
+    height: 26px;
+  }
+  .theme-toggle-thumb {
+    width: 20px;
+    height: 20px;
+    transform: translateX(22px);
+  }
+  html[data-theme="light"] .theme-toggle-thumb {
+    transform: translateX(0px);
+  }
+  .theme-toggle-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 /* Reduced motion */
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
@@ -230,6 +559,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
   #brand-mark,#nav,#nav.nav-hidden,#nav.nav-init{opacity:1!important;transform:none!important;transition:none!important}
   #spb{display:none}
   .train{animation:none;transform:translateX(-200%)}
+  .theme-toggle-thumb, .theme-toggle-icon, .theme-toggle-track{transition:none!important}
 }
 </style>
 </head>
@@ -249,6 +579,25 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 <div class="bg-overlay" aria-hidden="true"></div>
 <!-- Technical coordinate grid overlay -->
 <div class="gbg" id="gbg" aria-hidden="true"></div>
+
+<!-- Light Mode Clean Technical Background Layer -->
+<div class="bg-light-layer" id="bglight" aria-hidden="true">
+  <div class="bg-light-glow bg-light-amber"></div>
+  <div class="bg-light-glow bg-light-steel"></div>
+  <div class="bg-light-grid"></div>
+  <svg class="bg-light-network" viewBox="0 0 1440 900" fill="none" preserveAspectRatio="xMidYMid slice">
+    <path d="M-100 180 C240 180, 480 320, 840 280 C1120 250, 1340 380, 1600 360" stroke="rgba(100,116,139,0.08)" stroke-width="1.5" stroke-dasharray="6 6"/>
+    <path d="M-50 420 C320 400, 620 490, 960 410 C1220 350, 1400 480, 1600 450" stroke="rgba(100,116,139,0.06)" stroke-width="1.2"/>
+    <path d="M180 -50 C260 220, 480 320, 680 540 C840 710, 1100 820, 1320 980" stroke="rgba(122,162,199,0.09)" stroke-width="1.2"/>
+    <path d="M480 320 C640 240, 920 220, 1180 140" stroke="rgba(242,169,59,0.14)" stroke-width="1.5"/>
+    <path d="M680 540 C880 560, 1120 480, 1420 520" stroke="rgba(100,116,139,0.06)" stroke-width="1"/>
+    <circle cx="480" cy="320" r="4.5" fill="none" stroke="rgba(242,169,59,0.3)" stroke-width="1.5"/>
+    <circle cx="480" cy="320" r="2" fill="rgba(242,169,59,0.45)"/>
+    <circle cx="840" cy="280" r="3.5" fill="none" stroke="rgba(122,162,199,0.3)" stroke-width="1.2"/>
+    <circle cx="680" cy="540" r="4" fill="none" stroke="rgba(100,116,139,0.25)" stroke-width="1.2"/>
+    <circle cx="960" cy="410" r="4" fill="none" stroke="rgba(242,169,59,0.3)" stroke-width="1.2"/>
+  </svg>
+</div>
 
 <!-- Ambient particles -->
 <div class="pt" style="width:280px;height:280px;top:8%;left:4%;background:rgba(242,169,59,.09);--dur:10s;--tx:28px;--ty:-38px"></div>
@@ -272,7 +621,25 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <a href="#tech" class="nl-item nv-stag" data-sec="tech"><span class="nl-text">Technology</span></a>
       <a href="#developers" class="nl-item nv-stag" data-sec="developers"><span class="nl-text">Developers</span></a>
     </nav>
-    <a href="#demo" class="btn btn-p !py-2 !px-4 text-sm nv-stag absolute right-4 sm:right-6" id="nav-cta">Live Demo</a>
+    <div class="absolute right-3 sm:right-6 flex items-center gap-2 sm:gap-2.5">
+      <button id="theme-toggle" class="theme-toggle nv-stag" type="button" aria-label="Switch to light mode" title="Toggle theme">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb" aria-hidden="true"></span>
+          <span class="theme-toggle-icon theme-toggle-sun" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+            </svg>
+          </span>
+          <span class="theme-toggle-icon theme-toggle-moon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+          </span>
+        </span>
+      </button>
+      <a href="#demo" class="btn btn-p !py-2 !px-3 sm:!px-4 text-xs sm:text-sm nv-stag shrink-0" id="nav-cta">Live Demo</a>
+    </div>
   </div>
 </header>
 
@@ -492,7 +859,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <!-- 1. Aviral -->
       <div class="dev-card dev-card-rv" data-name="Aviral">
         <div class="dev-media">
-          <img class="dev-img" src="/assets/aviral.jpg" alt="Aviral">
+          <img class="dev-img" src="assets/aviral.jpg" alt="Aviral" loading="lazy">
         </div>
         <div class="dev-overlay"></div>
         <div class="dev-bottom">
@@ -508,7 +875,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <!-- 2. Ritik -->
       <div class="dev-card dev-card-rv" data-name="Ritik">
         <div class="dev-media">
-          <img class="dev-img" src="/assets/ritik.jpg" alt="Ritik">
+          <img class="dev-img" src="assets/ritik.jpg" alt="Ritik" loading="lazy">
         </div>
         <div class="dev-overlay"></div>
         <div class="dev-bottom">
@@ -524,7 +891,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <!-- 3. Bhuvan -->
       <div class="dev-card dev-card-rv" data-name="Bhuvan">
         <div class="dev-media">
-          <img class="dev-img" src="/assets/bhuvan.jpg" alt="Bhuvan">
+          <img class="dev-img" src="assets/bhuvan.jpg" alt="Bhuvan" loading="lazy">
         </div>
         <div class="dev-overlay"></div>
         <div class="dev-bottom">
@@ -540,7 +907,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <!-- 4. Nishi -->
       <div class="dev-card dev-card-rv" data-name="Nishi">
         <div class="dev-media">
-          <img class="dev-img" src="/assets/nishi.jpg" alt="Nishi">
+          <img class="dev-img" src="assets/nishi.jpg" alt="Nishi" loading="lazy">
         </div>
         <div class="dev-overlay"></div>
         <div class="dev-bottom">
@@ -556,7 +923,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <!-- 5. Shreemai -->
       <div class="dev-card dev-card-rv" data-name="Shreemai">
         <div class="dev-media">
-          <img class="dev-img" src="/assets/shreemai.jpg" alt="Shreemai">
+          <img class="dev-img" src="assets/shreemai.jpg" alt="Shreemai" loading="lazy">
         </div>
         <div class="dev-overlay"></div>
         <div class="dev-bottom">
@@ -572,7 +939,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
       <!-- 6. Sana -->
       <div class="dev-card dev-card-rv" data-name="Sana">
         <div class="dev-media">
-          <img class="dev-img" src="/assets/sana.jpg" alt="Sana">
+          <img class="dev-img" src="assets/sana.jpg" alt="Sana" loading="lazy">
         </div>
         <div class="dev-overlay"></div>
         <div class="dev-bottom">
@@ -609,6 +976,36 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 /* ═══ Rail Samanvay Premium Animation System ═══ */
 document.title = 'Rail Samanvay';
 const $=id=>document.getElementById(id);
+
+/* ── Theme Switcher Controller ── */
+const themeToggle=$('theme-toggle');
+function updateThemeUI(theme){
+  if(theme==='light'){
+    document.documentElement.setAttribute('data-theme','light');
+    if(themeToggle){
+      themeToggle.setAttribute('aria-label','Switch to dark mode');
+      themeToggle.setAttribute('title','Switch to dark mode');
+    }
+  }else{
+    document.documentElement.setAttribute('data-theme','dark');
+    if(themeToggle){
+      themeToggle.setAttribute('aria-label','Switch to light mode');
+      themeToggle.setAttribute('title','Switch to light mode');
+    }
+  }
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')||'dark';
+  const next=cur==='light'?'dark':'light';
+  updateThemeUI(next);
+  try{localStorage.setItem('rail-samanvay-theme',next)}catch(e){}
+}
+if(themeToggle){
+  themeToggle.addEventListener('click',toggleTheme);
+  const curTheme=document.documentElement.getAttribute('data-theme')||'dark';
+  updateThemeUI(curTheme);
+}
+
 const fill=(id,arr,fn)=>$(id).innerHTML=arr.map(fn).join('');
 const ic=p=>`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
@@ -786,7 +1183,7 @@ function updateSpb(){
 }
 
 /* ── Navbar Scroll & Motion System ── */
-const nav=$('nav'),nvi=$('nvi'),brandMark=$('brand-mark');
+const nav=$('nav'),nvi=$('nvi');
 let lastNavScrollY=0,lastScrollDir='none',navAccumDelta=0,isNavHidden=false;
 const NAV_TOP_ZONE=80;    // Always show navbar when within 80px of top
 const NAV_JITTER_THRESH=6; // Direction delta threshold in px to prevent jitter
@@ -794,12 +1191,6 @@ const NAV_JITTER_THRESH=6; // Direction delta threshold in px to prevent jitter
 function updateNav(){
   if(!nav)return;
   const sy=scrollY;
-
-  if(brandMark){
-    const brandProgress=clamp(sy/520,0,1);
-    brandMark.style.opacity=(1-brandProgress*.35).toFixed(3);
-    brandMark.style.setProperty('--brand-y',(-brandProgress*10).toFixed(1)+'px');
-  }
 
   // Glass transformation: blur & opacity intensify after initial scroll (35px)
   if(nvi)nvi.classList.toggle('sc',sy>35);
@@ -1225,7 +1616,7 @@ function runIntro(){
   // Navbar spring entrance & fast cohesive stagger
   if(nav){
     setTimeout(()=>nav.classList.remove('nav-init'),60);
-    setTimeout(()=>{if(brandMark)brandMark.classList.add('in')},20);
+    setTimeout(()=>{const l=$('nav-logo');if(l)l.classList.add('in')},100);
     setTimeout(()=>{const t=$('nav-title');if(t)t.classList.add('in')},150);
     const links=document.querySelectorAll('#nav-links .nl-item');
     links.forEach((lnk,i)=>setTimeout(()=>lnk.classList.add('in'),190+i*35));
