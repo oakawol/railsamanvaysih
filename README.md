@@ -1,8 +1,8 @@
-# Rail Samanvay — AI-Powered Railway Block Planning
+# Rail Samanvay: AI Powered Railway Block Planning
 
 > **Smart India Hackathon · Team SPIDER CODES · Problem Statement ID: 178452**
 
-Rail Samanvay is an intelligent corridor block planning and optimization system designed for Indian Railways. It merges disparate departmental maintenance requests (Engg, S&T, TRD) into synchronized, conflict-free, human-approved maintenance blocks—maximizing asset availability while keeping trains on schedule.
+Rail Samanvay is an intelligent corridor block planning and optimization system designed for Indian Railways. It combines disparate departmental maintenance requests across Engineering, Signalling & Telecommunication, and Traction Distribution into synchronized, conflict-free maintenance blocks while maximizing asset availability and keeping trains on schedule.
 
 ---
 
@@ -27,7 +27,7 @@ Rail Samanvay is an intelligent corridor block planning and optimization system 
 
 ```text
 ├── index.html                                  # Primary entry point (GitHub Pages ready)
-├── Rail Samanvay — SIH Frontend Prototype.html  # Original prototype file
+├── Rail Samanvay (SIH Frontend Prototype).html  # Original prototype file
 ├── assets/
 │   ├── logo.png                                # Official Rail Samanvay logo
 │   └── backgroundblack.jpg                     # Primary network topology background

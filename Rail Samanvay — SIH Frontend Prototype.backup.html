@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Rail Samanvay — AI-Powered Block Planning for Indian Railways</title>
+<title>Rail Samanvay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -55,7 +55,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
  <p class="eyebrow r">Smart India Hackathon · Team SPIDER CODES · ID 178452</p>
  <p class="r mt-3 inline-flex items-center gap-2 self-start text-xs px-3 py-1.5 rounded-full border border-white/15 bg-white/5 text-[color:var(--mut)]"><span class="w-2 h-2 rounded-full" style="background:var(--acc);animation:pulse 2s infinite"></span>Frontend concept prototype · not a working system</p>
  <h1 class="r text-[2.6rem] sm:text-6xl lg:text-7xl font-extrabold leading-[1.02] mt-4 max-w-4xl">Smarter Blocks.<br><span style="color:var(--acc)">Safer Assets.</span><br>Smoother Operations.</h1>
- <p class="r mt-6 text-lg text-[color:var(--mut)] max-w-2xl">AI-powered automatic block planning that merges maintenance needs of every railway department into fewer, safer blocks — maximizing asset availability while keeping trains on time.</p>
+ <p class="r mt-6 text-lg text-[color:var(--mut)] max-w-2xl">AI-powered automatic block planning that merges maintenance needs of every railway department into fewer, safer blocks   maximizing asset availability while keeping trains on time.</p>
  <div class="r mt-9 flex flex-wrap gap-3"><a href="#demo" class="btn btn-p">See blocks merge →</a><a href="#how" class="btn btn-g">How it works</a></div>
  <div class="r mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl">
   <div class="glass p-4"><div class="hd text-3xl font-bold" style="color:var(--acc)">4</div><div class="text-xs text-[color:var(--mut)] mt-1">Railway systems integrated</div></div>
@@ -104,7 +104,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
    <div id="rows"></div>
   </div></div>
   <p class="text-[11px] uppercase tracking-widest mt-6" style="color:var(--acc)">Illustrative animation · not live optimizer output</p>
-  <p id="cap" class="text-sm text-[color:var(--mut)] mt-2">Each department requests its own closure — three blocks, overlapping disruption.</p>
+  <p id="cap" class="text-sm text-[color:var(--mut)] mt-2">Each department requests its own closure, creating three separate blocks with overlapping disruption.</p>
  </div>
 </section>
 
@@ -122,7 +122,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
  <h2 class="r text-3xl sm:text-5xl font-bold mt-3 max-w-3xl">No black box. Every priority comes with a reason.</h2>
  <div class="grid lg:grid-cols-5 gap-4 mt-10">
   <div class="r glass p-6 sm:p-8 lg:col-span-3">
-   <div class="flex justify-between items-start"><div><p class="text-xs text-[color:var(--mut)]">Maintenance task</p><p class="hd text-xl font-semibold">Track Renewal · Section KM 312–318</p></div><div class="text-right"><p class="text-xs text-[color:var(--mut)]">Priority score</p><p class="hd text-4xl font-extrabold" style="color:var(--acc)">87</p></div></div>
+   <div class="flex justify-between items-start"><div><p class="text-xs text-[color:var(--mut)]">Maintenance task</p><p class="hd text-xl font-semibold">Track Renewal · Section KM 312 to 318</p></div><div class="text-right"><p class="text-xs text-[color:var(--mut)]">Priority score</p><p class="hd text-4xl font-extrabold" style="color:var(--acc)">87</p></div></div>
    <p class="text-xs text-[color:var(--mut)] mt-6 mb-3">SHAP feature contribution (illustrative)</p>
    <div id="shap" class="space-y-4"></div>
   </div>
@@ -165,7 +165,7 @@ h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
 <!-- FEASIBILITY -->
 <section class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
  <div class="r glass p-6 sm:p-10 grid lg:grid-cols-2 gap-8">
-  <div><p class="eyebrow">Feasibility</p><h2 class="text-3xl sm:text-4xl font-bold mt-3">Works with what Railways already has.</h2><p class="text-[color:var(--mut)] mt-4">A software layer on top of existing systems — no replacement, no new hardware, and a corridor-by-corridor rollout path.</p></div>
+  <div><p class="eyebrow">Feasibility</p><h2 class="text-3xl sm:text-4xl font-bold mt-3">Works with what Railways already has.</h2><p class="text-[color:var(--mut)] mt-4">Rail Samanvay functions as a software layer on top of existing systems, requiring no new hardware and rolling out smoothly corridor by corridor.</p></div>
   <ul id="feas" class="space-y-3"></ul>
  </div>
 </section>
@@ -212,7 +212,7 @@ const rows=[['Engineering','#f2a93b',[8,22],[24,3]],['Signal & Telecom','#7aa2c7
 $('rows').innerHTML=rows.map((r,i)=>`<div class="flex items-center mb-3"><div class="w-28 text-xs text-[color:var(--mut)] shrink-0">${r[0]}</div><div class="relative flex-1 h-12 rounded-lg bg-white/5"><div class="blk" data-i="${i}" style="left:${r[2][0]}%;width:${r[2][1]}%;background:${r[1]}">${r[0].split(' ')[0]}</div></div></div>`).join('');
 const mode=m=>{document.querySelectorAll('.blk').forEach((b,i)=>{const r=rows[i];b.style.left=(m?r[3][0]:r[2][0])+'%';b.style.width=(m?r[3][1]+ (i==1?0:0):r[2][1])+'%';b.style.width=(m?36:22)+'%';b.style.left=(m?[32,32,32][i]:r[2][0])+'%';b.style.opacity=m&&i>0?.55:1});
  $('k1').textContent=m?'1':'3';$('k2').textContent=m?'2.5 h':'6 h';
- $('cap').textContent=m?'Compatible jobs share one optimized window, placed where train movement allows — one closure instead of three.':'Each department requests its own closure — three blocks, overlapping disruption.';
+ $('cap').textContent=m?'Compatible jobs share one optimized window scheduled around train movement, unifying three closures into one.':'Each department requests its own closure, creating three separate blocks with overlapping disruption.';
  $('b1').style.background=m?'':'rgba(242,169,59,.25)';$('b2').style.background=m?'rgba(242,169,59,.25)':''};
 $('b1').onclick=()=>mode(0);$('b2').onclick=()=>mode(1);mode(0);
 let auto=1;[$('b1'),$('b2')].forEach(b=>b.addEventListener('click',()=>auto=0));
