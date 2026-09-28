@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rail Samanvay — AI-Powered Block Planning for Indian Railways</title>
+<meta name="description" content="Rail Samanvay is an AI-powered automatic block planning system that merges maintenance needs of every railway department into fewer, safer blocks — maximising asset availability while keeping trains on time.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{colors:{ink:'#08101d',amber:{DEFAULT:'#f2a93b'},steel:'#7aa2c7'},fontFamily:{head:['"Bricolage Grotesque"','sans-serif'],body:['"DM Sans"','sans-serif']}}}}</script>
+<style>
+:root{
+  --bg:#08101d;--tx:#e8edf5;--mut:#93a3b8;
+  --acc:#f2a93b;--gl:rgba(255,255,255,.055);--gl2:rgba(255,255,255,.085);
+  --bd:rgba(255,255,255,.12);--bd2:rgba(255,255,255,.22);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px)
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:80px;height:100%}
+body{
+  background:var(--bg);color:var(--tx);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;color-scheme:dark;
+  -webkit-font-smoothing:antialiased;
+  cursor:none
+}
+@media(pointer:coarse){body{cursor:auto}}
+h1,h2,h3,.hd{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+
+/* Scroll progress */
+#spb{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--acc),rgba(242,169,59,.55));z-index:9999;width:0%;box-shadow:0 0 10px rgba(242,169,59,.45)}
+
+/* Custom cursor */
+#cdot{position:fixed;width:6px;height:6px;background:var(--acc);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);opacity:0;transition:transform .18s,opacity .3s,background .2s}
+@media(pointer:coarse){#cdot{display:none}}
+
+/* ── Primary Background Image Layer (backgroundblack.jpg) ── */
+.bg-img{position:fixed;inset:-16px;z-index:-4;background-image:url('assets/backgroundblack.jpg');background-size:cover;background-position:center center;background-repeat:no-repeat;will-change:transform,opacity;opacity:0;transition:opacity 1.2s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.bg-img.in{opacity:1}
+@media(max-width:768px){.bg-img{background-position:center 32%}}
+.bg-overlay{position:fixed;inset:0;z-index:-3;background:rgba(5,11,20,.26);pointer-events:none}
+.gbg{position:fixed;inset:0;z-index:-2;opacity:0;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(circle at 50% 36%,#000 25%,transparent 75%);will-change:transform,opacity;transition:opacity 1.4s ease;pointer-events:none}
+.gbg.in{opacity:.035}
+
+/* Particles */
+.pt{position:fixed;border-radius:50%;pointer-events:none;z-index:-1;animation:fpt var(--dur,9s) ease-in-out infinite alternate}
+@keyframes fpt{0%{transform:translate(0,0);opacity:.12}100%{transform:translate(var(--tx,20px),var(--ty,-30px));opacity:.05}}
+.pt-dot{position:absolute;border-radius:50%;background:rgba(242,169,59,.32);box-shadow:0 0 8px rgba(242,169,59,.35);pointer-events:none;z-index:1;opacity:.45;animation:pdotFloat 9s ease-in-out infinite alternate}
+@keyframes pdotFloat{0%{transform:translate(0,0)}100%{transform:translate(12px,-20px)}}
+
+/* Glass */
+.glass{background:var(--gl);border:1px solid var(--bd);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.07)}
+
+/* Eyebrow entrance & shimmer */
+.eyebrow{color:var(--acc);font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;font-weight:600}
+#h-ey{opacity:0;transform:translateY(12px);letter-spacing:.32em;position:relative;display:inline-block;transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.22,1,.36,1),letter-spacing .65s cubic-bezier(.22,1,.36,1);will-change:transform,opacity,letter-spacing}
+#h-ey.in{opacity:1;transform:translateY(0);letter-spacing:.24em}
+#h-ey::after{content:'Smart India Hackathon · Team SPIDER CODES · ID 178452';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.55) 50%,transparent 75%);background-size:220% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0}
+#h-ey.shimmer::after{animation:eySweep 1.1s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes eySweep{0%{background-position:-160% 0;opacity:0}25%{opacity:.75}75%{opacity:.75}100%{background-position:160% 0;opacity:0}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.5rem;border-radius:999px;font-weight:600;cursor:none;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .3s,background .25s}
+@media(pointer:coarse){.btn{cursor:auto}}
+.btn-p{background:var(--acc);color:#1a1200}
+.btn-p::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.22) 50%,transparent 62%);transform:translateX(-100%);transition:transform .55s ease}
+.btn-p:hover::after{transform:translateX(100%)}
+.btn-p:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 8px 32px rgba(242,169,59,.48),0 0 0 1px rgba(242,169,59,.28)}
+.btn-g{border:1px solid var(--bd);background:var(--gl);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.btn-g:hover{background:var(--gl2);border-color:var(--bd2);transform:translateY(-2px)}
+
+/* Hero CTA Buttons */
+.hero-btn{opacity:0;transform:translateY(15px) scale(.96);transition:opacity .5s cubic-bezier(.22,1,.36,1),transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .35s ease,background .25s ease;will-change:transform,opacity}
+.hero-btn.in{opacity:1;transform:translateY(0) scale(1)}
+@media(hover:hover) and (pointer:fine){
+  .hero-btn:hover{transform:translateY(-2px) scale(1.04)!important}
+  #cta-d:hover{box-shadow:0 8px 24px rgba(242,169,59,.38),0 0 0 1px rgba(242,169,59,.25)!important}
+  #cta-h:hover{box-shadow:0 8px 24px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.18)!important}
+}
+
+/* ── Navbar System ── */
+#nav{position:fixed;left:0;right:0;z-index:500;top:env(safe-area-inset-top,0px);will-change:transform,opacity;transform:translateY(0) scale(1);opacity:1;transition:transform .52s cubic-bezier(.16,1.32,.28,1),opacity .38s cubic-bezier(.16,1,.3,1)}
+#nav.nav-hidden{transform:translateY(-120%) scale(.98);opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.32,0,.67,0),opacity .38s cubic-bezier(.32,0,.67,0)}
+#nav.nav-init{transform:translateY(-30px) scale(.97)!important;opacity:0!important}
+.nv-i{background:rgba(12,22,38,.45);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-radius:999px;box-shadow:0 4px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.08);transition:background .4s cubic-bezier(.22,1,.36,1),border-color .4s cubic-bezier(.22,1,.36,1),box-shadow .4s cubic-bezier(.22,1,.36,1),backdrop-filter .4s cubic-bezier(.22,1,.36,1)}
+.nv-i.sc{background:rgba(8,16,29,.82);border-color:rgba(255,255,255,.16);backdrop-filter:blur(24px) saturate(190%);-webkit-backdrop-filter:blur(24px) saturate(190%);box-shadow:0 16px 40px -8px rgba(0,0,0,.65),0 0 0 1px rgba(242,169,59,.09),inset 0 1px 0 rgba(255,255,255,.12)}
+.nv-stag{opacity:0;transform:translateY(-8px);transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .45s cubic-bezier(.16,1.25,.3,1)}
+.nv-stag.in{opacity:1;transform:none}
+#nav-logo{height:44px;width:auto;object-fit:contain;will-change:transform,opacity,filter;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .45s cubic-bezier(.16,1,.3,1),filter .35s ease}
+@media(max-width:640px){#nav-logo{height:38px}}
+#nav-logo.nv-stag{opacity:0;transform:translateY(-10px) scale(.92)}
+#nav-logo.nv-stag.in{opacity:1;transform:translateY(0) scale(1)}
+@media(hover:hover) and (pointer:fine){
+  #nav-brand:hover #nav-logo{transform:translateY(-1px) scale(1.05)!important;filter:drop-shadow(0 2px 10px rgba(242,169,59,.42)) drop-shadow(0 0 5px rgba(242,169,59,.25))}
+}
+/* ── Navigation Links & Moving Spring Indicator ── */
+#nav-links{position:relative;display:flex;align-items:center}
+.nl-item{position:relative;z-index:2;color:var(--mut);font-weight:500;padding:6px 12px;cursor:none;text-decoration:none;transition:color .22s cubic-bezier(.22,1,.36,1),opacity .4s ease;user-select:none}
+@media(pointer:coarse){.nl-item{cursor:auto}}
+.nl-item.active,.nl-item:hover{color:#fff}
+.nl-text{display:inline-block;will-change:transform;transition:transform .24s cubic-bezier(.22,1,.36,1)}
+@media(hover:hover) and (pointer:fine){
+  .nl-item:hover .nl-text{transform:translateY(-1px) scale(1.025)}
+}
+#nav-indicator{position:absolute;bottom:-3px;left:0;height:2px;border-radius:99px;pointer-events:none;z-index:3;opacity:0;transform-origin:center;will-change:transform,width,opacity;transition:transform .38s cubic-bezier(.18,1.26,.28,1),width .36s cubic-bezier(.18,1.26,.28,1),opacity .25s ease}
+.nav-ind-line{width:100%;height:100%;border-radius:99px;background:linear-gradient(90deg,rgba(242,169,59,.6),var(--acc),rgba(242,169,59,.6))}
+.nav-ind-glow{position:absolute;inset:-3px 0;background:radial-gradient(ellipse at center,rgba(242,169,59,.55) 0%,transparent 75%);filter:blur(3px);pointer-events:none}
+#nav-hover-bg{position:absolute;top:2px;bottom:2px;left:0;border-radius:999px;pointer-events:none;z-index:1;opacity:0;transform:scale(.7);transform-origin:center;background:radial-gradient(ellipse at center,rgba(242,169,59,.12) 0%,rgba(255,255,255,.05) 55%,transparent 100%),rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);backdrop-filter:blur(8px);will-change:transform,width,opacity;transition:transform .28s cubic-bezier(.22,1,.36,1),width .28s cubic-bezier(.22,1,.36,1),opacity .24s ease}
+#nav-cta{transition:transform .38s cubic-bezier(.34,1.56,.64,1),box-shadow .32s ease,background .25s ease,opacity .4s ease}
+#nav-cta.nv-stag{opacity:0;transform:scale(.9) translateY(-4px)}
+#nav-cta.nv-stag.in{opacity:1;transform:scale(1) translateY(0)}
+@media(hover:hover) and (pointer:fine){#nav-cta:hover{transform:translateY(-2px) scale(1.04)!important;box-shadow:0 8px 24px rgba(242,169,59,.48),0 0 0 1px rgba(242,169,59,.3)!important}}
+@media(max-width:640px){#nav{transition:transform .44s cubic-bezier(.16,1.32,.28,1),opacity .3s ease}#nav.nav-hidden{transition:transform .34s cubic-bezier(.32,0,.67,0),opacity .3s ease}}
+
+/* Reveal */
+.rv{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.rv.in{opacity:1;transform:none}
+
+/* Text mask line reveal with physical blur unmask */
+.trw{overflow:hidden;display:block;will-change:transform}
+.trl{display:block;transform:translateY(105%);opacity:0;filter:blur(8px);transition:transform .85s cubic-bezier(.22,1,.36,1),opacity .65s cubic-bezier(.22,1,.36,1),filter .75s cubic-bezier(.22,1,.36,1);will-change:transform,opacity,filter}
+.trl.in{transform:translateY(0);opacity:1;filter:blur(0)}
+
+/* Amber headline sweep */
+.trl-amber{color:var(--acc);position:relative;display:inline-block}
+.trl-amber::after{content:'Safer Assets.';position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.55) 50%,transparent 80%);background-size:220% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;opacity:0}
+.trl-amber.shimmer::after{animation:amberSweep 1.1s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes amberSweep{0%{background-position:-160% 0;opacity:0}20%{opacity:.85}75%{opacity:.85}100%{background-position:160% 0;opacity:0}}
+
+/* Description lines */
+.dline-wrap{display:block;overflow:hidden}
+.dline{display:block;opacity:0;transform:translateY(16px);filter:blur(4px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1),filter .65s cubic-bezier(.22,1,.36,1);will-change:transform,opacity,filter}
+.dline.in{opacity:1;transform:translateY(0);filter:blur(0)}
+
+/* Card */
+.card{transition:transform .4s cubic-bezier(.22,1,.36,1),box-shadow .4s,border-color .4s,background .3s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-7px);border-color:rgba(242,169,59,.38);background:var(--gl2);box-shadow:0 20px 60px rgba(0,0,0,.38),0 0 0 1px rgba(242,169,59,.14)}
+.cgl{position:absolute;inset:0;pointer-events:none;border-radius:inherit;opacity:0;background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(242,169,59,.07),transparent 70%);transition:opacity .4s}
+.card:hover .cgl{opacity:1}
+
+/* Hero */
+#hero{position:relative;overflow:hidden}
+.hc{position:relative;z-index:2;will-change:transform,opacity,filter}
+.htw{position:absolute;left:0;right:0;bottom:0;height:140px;overflow:hidden;pointer-events:none;will-change:transform;opacity:0;transform:translateY(20px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
+.htw.in{opacity:1;transform:translateY(0)}
+
+/* Train */
+@keyframes run{from{transform:translateX(-660px)}to{transform:translateX(110vw)}}
+@keyframes sl{to{transform:translateX(-48px)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes dash{to{stroke-dashoffset:-40}}
+.train{animation:run 14s linear infinite;will-change:transform}
+.slp{animation:sl .5s linear infinite;will-change:transform}
+
+/* Gantt */
+.blk{position:absolute;top:6px;bottom:6px;border-radius:8px;transition:all 1.1s cubic-bezier(.6,0,.2,1);font-size:.68rem;display:flex;align-items:center;justify-content:center;font-weight:600;color:#08101d}
+.bar{height:8px;border-radius:9px;background:linear-gradient(90deg,#3a6ea5,var(--acc));width:0;transition:width 1.5s cubic-bezier(.2,.7,.2,1)}
+.flow{stroke-dasharray:6 8;animation:dash 1.2s linear infinite}
+
+/* Timeline steps */
+.st-it{transition:opacity .4s}
+.st-it:not(.act){opacity:.5}
+.st-it.act{opacity:1}
+.st-num{transition:background .4s,box-shadow .4s,transform .35s cubic-bezier(.22,1,.36,1)}
+.st-it.act .st-num{background:var(--acc)!important;color:#1a1200!important;box-shadow:0 0 22px rgba(242,169,59,.5);transform:scale(1.1)}
+#tlf{height:0%;transition:height .5s cubic-bezier(.22,1,.36,1);background:var(--acc);border-radius:9px}
+
+/* CMP rows */
+.cr{opacity:0;transform:translateX(-14px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.cr.in{opacity:1;transform:none}
+
+/* Tech pills */
+.tpill{transition:transform .3s cubic-bezier(.22,1,.36,1),border-color .3s,background .3s}
+.tpill:hover{transform:translateY(-3px);border-color:rgba(242,169,59,.38);background:rgba(242,169,59,.07)}
+
+/* Stagger */
+.sgc{opacity:0;transform:translateY(22px) scale(.985);transition:opacity .72s cubic-bezier(.22,1,.36,1),transform .72s cubic-bezier(.22,1,.36,1)}
+.sgc.in{opacity:1;transform:none}
+
+/* Feasibility */
+.fit{opacity:0;transform:translateX(-10px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.fit.in{opacity:1;transform:none}
+
+/* SHAP rows */
+.shr{opacity:0;transform:translateX(-12px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.shr.in{opacity:1;transform:none}
+
+/* Vision accent */
+.va{position:relative;display:inline}
+.va::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--acc);transform:scaleX(0);transform-origin:left;transition:transform 1.2s cubic-bezier(.22,1,.36,1) .3s}
+.va.lit::after{transform:scaleX(1)}
+
+/* Intro overlay & logo reveal */
+#io{position:fixed;inset:0;z-index:8000;background:var(--bg);pointer-events:none;transition:opacity .65s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:center}
+#io-logo{opacity:0;transform:scale(.9);filter:blur(6px);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .5s cubic-bezier(.34,1.56,.64,1),filter .45s ease;will-change:transform,opacity,filter}
+#io-logo.in{opacity:1;transform:scale(1);filter:blur(0)}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .rv,.sgc,.trl,.cr,.fit,.shr,.nv-stag,.dline,.hero-btn,#h-ey,.htw,.bg-img,.gbg{opacity:1!important;transform:none!important;filter:none!important}
+  #nav,#nav.nav-hidden,#nav.nav-init{opacity:1!important;transform:none!important;transition:none!important}
+  #spb{display:none}
+  .train{animation:none;transform:translateX(-200%)}
+}
+</style>
+</head>
+<body>
+
+<div id="io">
+  <div id="io-logo">
+    <img src="assets/logo.png" alt="Rail Samanvay" class="h-20 sm:h-24 w-auto object-contain" style="filter:drop-shadow(0 0 24px rgba(242,169,59,.35))">
+  </div>
+</div>
+<div id="spb"></div>
+<div id="cdot"></div>
+
+<!-- Primary Background Layer: backgroundblack.jpg -->
+<div class="bg-img" id="bgimg" aria-hidden="true"></div>
+<!-- Subtle dark navy overlay to ensure text contrast while preserving image details -->
+<div class="bg-overlay" aria-hidden="true"></div>
+<!-- Technical coordinate grid overlay -->
+<div class="gbg" id="gbg" aria-hidden="true"></div>
+
+<!-- Ambient particles -->
+<div class="pt" style="width:280px;height:280px;top:8%;left:4%;background:rgba(242,169,59,.09);--dur:10s;--tx:28px;--ty:-38px"></div>
+<div class="pt" style="width:200px;height:200px;top:58%;right:6%;background:rgba(58,110,165,.07);--dur:13s;--tx:-22px;--ty:32px"></div>
+<div class="pt" style="width:160px;height:160px;bottom:18%;left:32%;background:rgba(45,120,120,.06);--dur:11s;--tx:18px;--ty:-18px"></div>
+
+<!-- NAVBAR -->
+<header id="nav" class="nav-init">
+  <div class="nv-i mx-3 sm:mx-6 mt-3 px-4 sm:px-6 py-2 flex items-center justify-between" id="nvi">
+    <a href="#top" id="nav-brand" class="flex items-center" style="cursor:none" aria-label="Rail Samanvay">
+      <img src="assets/logo.png" alt="Rail Samanvay" id="nav-logo" class="nv-stag">
+    </a>
+    <nav id="nav-links" class="nav hidden md:flex items-center gap-1 sm:gap-2 text-sm relative">
+      <div id="nav-hover-bg" aria-hidden="true"></div>
+      <div id="nav-indicator" aria-hidden="true"><div class="nav-ind-line"></div><div class="nav-ind-glow"></div></div>
+      <a href="#problem" class="nl-item nv-stag" data-sec="problem"><span class="nl-text">Problem</span></a>
+      <a href="#how" class="nl-item nv-stag" data-sec="how"><span class="nl-text">How it works</span></a>
+      <a href="#ai" class="nl-item nv-stag" data-sec="ai"><span class="nl-text">Intelligence</span></a>
+      <a href="#features" class="nl-item nv-stag" data-sec="features"><span class="nl-text">Features</span></a>
+      <a href="#tech" class="nl-item nv-stag" data-sec="tech"><span class="nl-text">Technology</span></a>
+    </nav>
+    <a href="#demo" class="btn btn-p !py-2 !px-4 text-sm nv-stag" id="nav-cta">Live Demo</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section id="hero" class="min-h-screen pt-32 pb-44 px-5 sm:px-8 max-w-6xl mx-auto relative flex flex-col justify-center">
+  <!-- Floating ambient particles -->
+  <div class="pt-dot" style="top:22%;left:18%;width:3px;height:3px" aria-hidden="true"></div>
+  <div class="pt-dot" style="top:42%;right:20%;width:4px;height:4px" aria-hidden="true"></div>
+  <div class="pt-dot" style="top:68%;left:42%;width:3px;height:3px" aria-hidden="true"></div>
+  <div class="pt-dot" style="top:28%;right:36%;width:2px;height:2px" aria-hidden="true"></div>
+
+  <div class="hc" id="hcont">
+    <p class="eyebrow" id="h-ey">Smart India Hackathon · Team SPIDER CODES · ID 178452</p>
+    <h1 id="h-hd" class="mt-4 sm:mt-5 text-[2.6rem] sm:text-6xl lg:text-7xl font-extrabold leading-[1.02] max-w-4xl" aria-label="Smarter Blocks. Safer Assets. Smoother Operations.">
+      <span class="trw" id="hlw-1"><span class="trl" id="hl-1">Smarter Blocks.</span></span>
+      <span class="trw" id="hlw-2"><span class="trl trl-amber" id="hl-2">Safer Assets.</span></span>
+      <span class="trw" id="hlw-3"><span class="trl" id="hl-3">Smoother Operations.</span></span>
+    </h1>
+    <p id="h-desc" class="mt-6 text-lg text-[color:var(--mut)] max-w-2xl leading-relaxed">
+      <span class="dline-wrap"><span class="dline" id="hdl-1">AI-powered automatic block planning</span></span>
+      <span class="dline-wrap"><span class="dline" id="hdl-2">that merges maintenance needs of every railway department into fewer, safer blocks —</span></span>
+      <span class="dline-wrap"><span class="dline" id="hdl-3">maximizing asset availability while keeping trains on time.</span></span>
+    </p>
+    <div class="mt-9 flex flex-wrap gap-3" id="h-btns">
+      <a href="#demo" class="btn btn-p hero-btn" id="cta-d">See blocks merge →</a>
+      <a href="#how" class="btn btn-g hero-btn" id="cta-h">How it works</a>
+    </div>
+    <div class="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl" id="hst">
+      <div class="glass p-4 card sgc"><div class="cgl"></div><div class="hd text-3xl font-bold ctr" style="color:var(--acc)" data-t="4" data-s="">4</div><div class="text-xs text-[color:var(--mut)] mt-1">Railway systems integrated</div></div>
+      <div class="glass p-4 card sgc" style="--d:1"><div class="cgl"></div><div class="hd text-3xl font-bold ctr" style="color:var(--acc)" data-t="1" data-s="">1</div><div class="text-xs text-[color:var(--mut)] mt-1">Unified planning layer</div></div>
+      <div class="glass p-4 card sgc" style="--d:2"><div class="cgl"></div><div class="hd text-3xl font-bold ctr" style="color:var(--acc)" data-t="0" data-s="">0</div><div class="text-xs text-[color:var(--mut)] mt-1">New hardware needed</div></div>
+      <div class="glass p-4 card sgc" style="--d:3"><div class="cgl"></div><div class="hd text-3xl font-bold ctr" style="color:var(--acc)" data-t="100" data-s="%">100%</div><div class="text-xs text-[color:var(--mut)] mt-1">Human-approved plans</div></div>
+    </div>
+  </div>
+
+  <!-- Train scene -->
+  <div class="htw" id="htrain" aria-hidden="true">
+    <svg class="absolute bottom-0 w-full h-full" viewBox="0 0 1200 140" preserveAspectRatio="none">
+      <path d="M0 100 L60 70 L110 95 L190 55 L260 90 L340 60 L430 98 L520 66 L600 92 L700 58 L790 96 L880 64 L980 94 L1080 62 L1200 90 V140 H0Z" fill="rgba(58,110,165,.14)"/>
+      <path d="M0 120 L120 102 L250 115 L380 98 L520 118 L670 100 L820 116 L960 100 L1100 112 L1200 104 V140 H0Z" fill="rgba(58,110,165,.07)"/>
+    </svg>
+    <div class="train absolute bottom-[26px] left-0">
+      <svg width="620" height="64" viewBox="0 0 620 64" fill="none">
+        <path d="M0 14 Q0 6 10 6 H160 V52 H0Z" fill="#f2a93b"/>
+        <rect x="0" y="34" width="160" height="8" fill="#0c1a2e"/>
+        <rect x="14" y="14" width="36" height="16" rx="3" fill="#0c1a2e"/>
+        <rect x="60" y="14" width="88" height="16" rx="3" fill="#7aa2c7" opacity=".55"/>
+        <circle cx="8" cy="46" r="3" fill="#fff8d6"><animate attributeName="opacity" values="1;.4;1" dur="2s" repeatCount="indefinite"/></circle>
+        <g fill="#dbe4ef"><rect x="168" y="6" width="140" height="46" rx="6"/><rect x="316" y="6" width="140" height="46" rx="6"/><rect x="464" y="6" width="140" height="46" rx="6"/></g>
+        <g fill="#3a6ea5"><rect x="168" y="34" width="140" height="6"/><rect x="316" y="34" width="140" height="6"/><rect x="464" y="34" width="140" height="6"/></g>
+        <g fill="#0c1a2e"><rect x="180" y="15" width="24" height="14" rx="2"/><rect x="214" y="15" width="24" height="14" rx="2"/><rect x="248" y="15" width="24" height="14" rx="2"/><rect x="328" y="15" width="24" height="14" rx="2"/><rect x="362" y="15" width="24" height="14" rx="2"/><rect x="396" y="15" width="24" height="14" rx="2"/><rect x="476" y="15" width="24" height="14" rx="2"/><rect x="510" y="15" width="24" height="14" rx="2"/><rect x="544" y="15" width="24" height="14" rx="2"/></g>
+        <g fill="#08101d" stroke="#93a3b8" stroke-width="2"><circle cx="30" cy="54" r="7"/><circle cx="130" cy="54" r="7"/><circle cx="190" cy="54" r="7"/><circle cx="280" cy="54" r="7"/><circle cx="340" cy="54" r="7"/><circle cx="430" cy="54" r="7"/><circle cx="488" cy="54" r="7"/><circle cx="580" cy="54" r="7"/></g>
+        <rect x="0" y="58" width="620" height="4" rx="2" fill="rgba(0,0,0,.22)"/>
+      </svg>
+    </div>
+    <div class="absolute bottom-[18px] left-0 right-0 h-[3px] bg-[#93a3b8]/60"></div>
+    <div class="absolute bottom-0 left-0 right-0 h-[14px] overflow-hidden">
+      <div class="slp h-full" style="width:calc(100% + 48px);background:repeating-linear-gradient(90deg,rgba(147,163,184,.35) 0 10px,transparent 10px 48px)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem" class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">The Problem</p>
+  <h2 class="mt-3 max-w-3xl text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">Every department plans alone.</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">The network pays for it.</span></span>
+  </h2>
+  <div class="grid md:grid-cols-3 gap-4 mt-10" id="prob"></div>
+  <div class="rv glass mt-6 p-6 sm:p-8 border-l-4" style="border-left-color:var(--acc);transition-delay:.2s">
+    <p class="eyebrow">The Challenge</p>
+    <p class="hd text-xl sm:text-2xl mt-2 font-semibold">How can multiple departmental maintenance requirements be intelligently combined into fewer, safer, and more efficient blocks while keeping trains moving?</p>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section id="demo" class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">Smart Block Planning</p>
+  <h2 class="mt-3 text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">From isolated to unified.</span></span>
+  </h2>
+  <div class="rv glass mt-10 p-5 sm:p-8 card" id="gcard" style="transition-delay:.08s">
+    <div class="cgl"></div>
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="flex gap-2"><button id="b1" class="btn btn-g !py-2 text-sm">Departmental plan</button><button id="b2" class="btn btn-g !py-2 text-sm">Rail Samanvay plan</button></div>
+      <div class="flex gap-6 text-sm"><div><span class="text-[color:var(--mut)]">Blocks</span> <b id="k1" class="hd text-2xl ml-1" style="color:var(--acc)">3</b></div><div><span class="text-[color:var(--mut)]">Track closed</span> <b id="k2" class="hd text-2xl ml-1" style="color:var(--acc)">6 h</b></div></div>
+    </div>
+    <div class="mt-8 overflow-x-auto"><div style="min-width:560px">
+      <div class="flex text-[11px] text-[color:var(--mut)] pl-28 mb-2 justify-between"><span>22:00</span><span>00:00</span><span>02:00</span><span>04:00</span><span>06:00</span></div>
+      <div id="rows"></div>
+    </div></div>
+    <p class="text-[11px] uppercase tracking-widest mt-6" style="color:var(--acc)">Illustrative animation · not live optimizer output</p>
+    <p id="cap" class="text-sm text-[color:var(--mut)] mt-2">Each department requests its own closure — three blocks, overlapping disruption.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">How It Works</p>
+  <h2 class="mt-3 text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">Six steps from raw data</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">to an approved plan.</span></span>
+  </h2>
+  <div class="relative mt-12">
+    <div class="absolute left-[27px] top-2 bottom-2 w-[2px] hidden sm:flex flex-col" style="border-radius:9px;background:rgba(255,255,255,.08)">
+      <div id="tlf" style="border-radius:9px"></div>
+    </div>
+    <div id="steps" class="space-y-4"></div>
+  </div>
+  <div class="rv glass mt-10 p-5 flex flex-wrap items-center justify-center gap-3 text-sm font-semibold" style="transition-delay:.12s">
+    <span class="text-[color:var(--mut)] font-normal">Integrated with</span>
+    <span class="px-4 py-1.5 rounded-full border border-white/15 tpill">TMS</span>
+    <span class="px-4 py-1.5 rounded-full border border-white/15 tpill">SMMS</span>
+    <span class="px-4 py-1.5 rounded-full border border-white/15 tpill">TDMS</span>
+    <span class="px-4 py-1.5 rounded-full border border-white/15 tpill">COA</span>
+  </div>
+</section>
+
+<!-- AI -->
+<section id="ai" class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">Intelligent Decision Making</p>
+  <h2 class="mt-3 max-w-3xl text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">No black box.</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">Every priority comes with a reason.</span></span>
+  </h2>
+  <div class="grid lg:grid-cols-5 gap-4 mt-10">
+    <div class="rv glass p-6 sm:p-8 lg:col-span-3 card tlt" id="shap-card" style="transition-delay:.05s">
+      <div class="cgl"></div>
+      <div class="flex justify-between items-start">
+        <div><p class="text-xs text-[color:var(--mut)]">Maintenance task</p><p class="hd text-xl font-semibold">Track Renewal · Section KM 312–318</p></div>
+        <div class="text-right"><p class="text-xs text-[color:var(--mut)]">Priority score</p><p class="hd text-4xl font-extrabold ctr" style="color:var(--acc)" data-t="87" data-s="">87</p></div>
+      </div>
+      <p class="text-xs text-[color:var(--mut)] mt-6 mb-3">SHAP feature contribution (illustrative)</p>
+      <div id="shap" class="space-y-4"></div>
+    </div>
+    <div class="lg:col-span-2 grid gap-4">
+      <div class="rv glass p-6 card sgc" style="--d:0;transition-delay:.1s"><div class="cgl"></div><h3 class="font-bold text-lg">AI Priority Scoring</h3><p class="text-sm text-[color:var(--mut)] mt-2">XGBoost ranks every requirement by urgency and risk.</p></div>
+      <div class="rv glass p-6 card sgc" style="--d:1;transition-delay:.18s"><div class="cgl"></div><h3 class="font-bold text-lg">Explainable by design</h3><p class="text-sm text-[color:var(--mut)] mt-2">SHAP shows exactly which factors pushed a score up or down.</p></div>
+      <div class="rv glass p-6 card tlt sgc" style="--d:2;transition-delay:.26s"><div class="cgl"></div><h3 class="font-bold text-lg">Constraint-based optimization</h3><p class="text-sm text-[color:var(--mut)] mt-2">OR-Tools CP-SAT respects safety and traffic constraints.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">Planning Comparison</p>
+  <h2 class="mt-3 text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">The difference,</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">side by side.</span></span>
+  </h2>
+  <div class="rv glass mt-10 overflow-hidden" style="transition-delay:.1s">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm" style="min-width:560px">
+        <thead><tr class="text-[color:var(--mut)] text-xs uppercase tracking-wider"><th class="p-4"></th><th class="p-4">Existing approach</th><th class="p-4" style="color:var(--acc)">Rail Samanvay</th></tr></thead>
+        <tbody id="cmp"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">Benefits</p>
+  <h2 class="mt-3 text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">Impact across assets,</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">operations and the network.</span></span>
+  </h2>
+  <div class="grid md:grid-cols-3 gap-4 mt-10" id="ben"></div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">Key Features</p>
+  <h2 class="mt-3 text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">Built for planners</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">who answer for safety.</span></span>
+  </h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10" id="feat"></div>
+</section>
+
+<!-- TECHNOLOGY -->
+<section id="tech" class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <p class="eyebrow rv">Technology</p>
+  <h2 class="mt-3 text-3xl sm:text-5xl font-bold">
+    <span class="trw"><span class="trl">A proven,</span></span>
+    <span class="trw"><span class="trl" style="color:var(--acc)">open stack.</span></span>
+  </h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10" id="tech-g"></div>
+</section>
+
+<!-- FEASIBILITY -->
+<section class="py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+  <div class="glass p-6 sm:p-10 grid lg:grid-cols-2 gap-8 card tlt rv" id="fcard">
+    <div class="cgl"></div>
+    <div><p class="eyebrow">Feasibility</p><h2 class="text-3xl sm:text-4xl font-bold mt-3">Works with what Railways already has.</h2><p class="text-[color:var(--mut)] mt-4">A software layer on top of existing systems — no replacement, no new hardware, and a corridor-by-corridor rollout path.</p></div>
+    <ul id="feas" class="space-y-3"></ul>
+  </div>
+</section>
+
+<!-- VISION -->
+<section class="py-28 px-5 sm:px-8 max-w-4xl mx-auto text-center" id="vis">
+  <p class="eyebrow rv">Vision</p>
+  <h2 class="mt-4 text-4xl sm:text-7xl font-extrabold leading-[1.02] rv" style="transition-delay:.08s">
+    Stronger assets.<br><span class="va" style="color:var(--acc)">Fewer failures.</span>
+  </h2>
+  <p class="rv mt-6 text-[color:var(--mut)] text-lg" style="transition-delay:.18s">Smarter planning · Better coordination · Higher asset availability · More reliable train operations.</p>
+  <p class="rv hd mt-8 text-xl font-semibold" style="transition-delay:.28s">Optimize Today. Enhance Tomorrow.</p>
+</section>
+</main>
+
+<footer class="border-t border-white/10 py-10 px-5 text-center text-sm text-[color:var(--mut)]">
+  <img src="assets/logo.png" alt="Rail Samanvay" class="h-11 sm:h-12 w-auto mx-auto object-contain drop-shadow-[0_2px_12px_rgba(242,169,59,0.22)] opacity-90 hover:opacity-100 transition-opacity">
+  <p class="mt-3">Smart India Hackathon · Team <b class="text-white">SPIDER CODES</b> · Team ID 178452</p>
+  <p class="mt-3 max-w-xl mx-auto text-xs opacity-80">This website is a frontend-only concept prototype. The AI scoring, optimization engine and data integrations shown are not implemented yet; all figures and visuals are illustrative.</p>
+</footer>
+
+<script>
+/* ═══ Rail Samanvay Premium Animation System ═══ */
+const $=id=>document.getElementById(id);
+const fill=(id,arr,fn)=>$(id).innerHTML=arr.map(fn).join('');
+const ic=p=>`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+const isTouch=()=>window.matchMedia('(pointer:coarse)').matches;
+const reduced=()=>window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+const isMob=()=>window.innerWidth<768;
+
+/* ── Content ── */
+fill('prob',[['Conflicting requirements','Departments submit needs independently, so requests collide.'],['Multiple closures','The same section is blocked again and again for separate jobs.'],['Wasted resources','Crew, machines and time slots are used inefficiently.']],
+(x,i)=>`<div class="glass p-6 card sgc rv" style="--d:${i}">
+  <div class="cgl"></div>
+  <div class="hd text-5xl font-extrabold opacity-30" style="color:var(--acc)">0${i+1}</div>
+  <h3 class="font-bold text-xl mt-3">${x[0]}</h3>
+  <p class="text-sm text-[color:var(--mut)] mt-2">${x[1]}</p>
+</div>`);
+
+fill('steps',[
+  ['Data Integration','Pulls train movement, maintenance requests, assets and corridor availability from TMS, SMMS, TDMS and COA.'],
+  ['Priority & Risk Analysis','Scores every task by urgency and risk to decide what needs attention first.'],
+  ['Compatibility Analysis','Finds maintenance activities that can safely be performed together.'],
+  ['Safety Validation','Applies safety and operational constraints before any schedule is produced.'],
+  ['Block Optimization','OR-Tools CP-SAT searches for the fewest, most efficient blocks.'],
+  ['Plan Visualization','A unified dashboard lets railway authorities review and approve the plan.']
+],(x,i)=>`<div class="glass p-5 sm:p-6 flex gap-4 sm:gap-6 items-start card st-it rv" data-si="${i}" style="transition-delay:${i*.06}s">
+  <div class="cgl"></div>
+  <div class="st-num w-14 h-14 rounded-full grid place-items-center font-bold text-lg hd shrink-0" style="background:rgba(242,169,59,.18);color:var(--acc)">0${i+1}</div>
+  <div><h3 class="font-bold text-lg">${x[0]}</h3><p class="text-sm text-[color:var(--mut)] mt-1">${x[1]}</p></div>
+</div>`);
+
+fill('shap',[['Days since last inspection',86],['Defect history',72],['Traffic density',58],['Asset age',44],['Weather exposure',25]],
+(x,i)=>`<div class="shr" style="transition-delay:${i*.1}s">
+  <div class="flex justify-between text-sm mb-1.5"><span>${x[0]}</span><span class="text-[color:var(--mut)]">+${(x[1]/10).toFixed(1)}</span></div>
+  <div class="h-2 rounded-full bg-white/10 relative overflow-hidden">
+    <div class="bar" data-w="${x[1]}"></div>
+    <div class="absolute inset-0 shap-sw" style="background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);transform:translateX(-100%)"></div>
+  </div>
+</div>`);
+
+fill('cmp',[
+  ['Coordination','Isolated and potentially conflicting','Unified across departments'],
+  ['Block planning','Multiple closures','Combined maintenance blocks'],
+  ['Decision basis','First-come approach','Risk and urgency based'],
+  ['Timetable fit','Assumed windows','Train movement & corridor availability'],
+  ['Planning horizon','Reactive, short-term','Weekly and monthly'],
+  ['Scalability','Limited planning','Expandable across railway zones']
+],(x,i)=>`<tr class="border-t border-white/10 cr" style="transition-delay:${i*.07}s">
+  <td class="p-4 font-semibold">${x[0]}</td>
+  <td class="p-4 text-[color:var(--mut)] opacity-60">${x[1]}</td>
+  <td class="p-4 font-medium">${x[2]}</td>
+</tr>`);
+
+fill('ben',[
+  ['Asset Impact',['Early identification of needs','Timely repair planning','Reduced failure risk','Improved asset availability']],
+  ['Operations Impact',['Better inter-department coordination','Fewer emergency repairs','Improved crew & resource planning','Efficient scheduling']],
+  ['Network Impact',['Fewer operational disruptions','Reduced delays & cancellations','Improved reliability','Transparent, scalable planning']]
+],(x,i)=>`<div class="glass p-6 card sgc rv" style="--d:${i};transition-delay:${i*.09}s">
+  <div class="cgl"></div>
+  <h3 class="font-bold text-xl" style="color:var(--acc)">${x[0]}</h3>
+  <ul class="mt-4 space-y-2.5 text-sm">${x[1].map(t=>`<li class="flex gap-2.5"><span style="color:var(--acc)">▸</span>${t}</li>`).join('')}</ul>
+</div>`);
+
+fill('feat',[
+  ['Unified Planning','Every department\'s needs in one environment.','<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/>'],
+  ['Risk-Based Priority','Tasks ranked by urgency and risk.','<path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/>'],
+  ['Intelligent Grouping','Compatible jobs share one block.','<circle cx="7" cy="7" r="3"/><circle cx="17" cy="7" r="3"/><circle cx="12" cy="17" r="3"/>'],
+  ['Safety-Aware','Constraints enforced during optimization.','<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>'],
+  ['Explainable AI','Clear reasons behind every score.','<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>'],
+  ['Optimized Plans','Efficient schedules via CP-SAT.','<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>'],
+  ['What-If Planning','Test how changes affect the plan.','<path d="M4 12a8 8 0 0114-5M20 12a8 8 0 01-14 5M18 3v4h-4M6 21v-4h4"/>'],
+  ['Scalable','Corridor-level to zone-wide.','<path d="M3 21l6-6M3 15v6h6M21 3l-6 6M21 9V3h-6"/>']
+],(x,i)=>`<div class="glass p-5 card sgc rv" style="--d:${i%4};transition-delay:${i*.07}s">
+  <div class="cgl"></div>
+  <div class="w-11 h-11 rounded-xl grid place-items-center mb-4" style="background:rgba(242,169,59,.14);color:var(--acc)">${ic(x[2])}</div>
+  <h3 class="font-bold">${x[0]}</h3>
+  <p class="text-sm text-[color:var(--mut)] mt-1.5">${x[1]}</p>
+</div>`);
+
+fill('tech-g',[
+  ['AI & ML',['XGBoost','SHAP']],
+  ['Optimization',['OR-Tools CP-SAT','Monte Carlo Stress Testing']],
+  ['Data & Processing',['Python','NetworkX','PostgreSQL','Neo4j','Kafka']],
+  ['Frontend',['React','Leaflet.js','Gantt scheduling','Planning dashboard']]
+],(x,i)=>`<div class="glass p-6 card sgc rv" style="--d:${i};transition-delay:${i*.08}s">
+  <div class="cgl"></div>
+  <h3 class="font-bold text-lg mb-4">${x[0]}</h3>
+  <div class="flex flex-wrap gap-2">${x[1].map((t,j)=>`<span class="tpill text-xs px-3 py-1.5 rounded-full border border-white/15 bg-white/5" style="transition-delay:${j*.05}s">${t}</span>`).join('')}</div>
+</div>`);
+
+fill('feas',['Uses existing railway data sources','No new hardware for the software layer','Explainable scoring, not only black-box decisions','Constraint-based schedule generation','Can begin with simulated data in real-world formats','Expands corridor-by-corridor across zones'],
+(t,i)=>`<li class="fit flex gap-3 items-start" style="transition-delay:${i*.07}s">
+  <span class="mt-0.5 w-5 h-5 rounded-full grid place-items-center text-[11px] shrink-0" style="background:var(--acc);color:#1a1200">✓</span>
+  <span class="text-sm">${t}</span>
+</li>`);
+
+/* ── Gantt Demo ── */
+const gRows=[['Engineering','#f2a93b',[8,22],[24,3]],['Signal & Telecom','#7aa2c7',[36,22],[44,3]],['Electrical (OHE)','#5fb3a3',[62,22],[54,3]]];
+$('rows').innerHTML=gRows.map((r,i)=>`<div class="flex items-center mb-3"><div class="w-28 text-xs text-[color:var(--mut)] shrink-0">${r[0]}</div><div class="relative flex-1 h-12 rounded-lg bg-white/5"><div class="blk" data-i="${i}" style="left:${r[2][0]}%;width:${r[2][1]}%;background:${r[1]}">${r[0].split(' ')[0]}</div></div></div>`).join('');
+
+let gMode=0,gAuto=1,gAnim=false;
+function animVal(el,from,to,ms,fmt){
+  const t0=performance.now();
+  const tick=now=>{
+    const p=Math.min((now-t0)/ms,1);
+    const e=1-Math.pow(1-p,3);
+    el.textContent=fmt(from+(to-from)*e);
+    if(p<1)requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function setGMode(m){
+  if(gAnim)return;gAnim=true;
+  const blks=document.querySelectorAll('.blk');
+  if(m){
+    blks.forEach((b,i)=>{b.style.left='32%';b.style.width='36%';b.style.opacity=i>0?'.5':'1'});
+    animVal($('k1'),3,1,900,v=>Math.round(v).toString());
+    animVal($('k2'),6,2.5,900,v=>v.toFixed(1)+' h');
+    $('cap').textContent='Compatible jobs share one optimized window, placed where train movement allows — one closure instead of three.';
+    $('b1').style.background='';$('b2').style.background='rgba(242,169,59,.25)';
+  } else {
+    blks.forEach((b,i)=>{const r=gRows[i];b.style.left=r[2][0]+'%';b.style.width=r[2][1]+'%';b.style.opacity='1'});
+    animVal($('k1'),1,3,900,v=>Math.round(v).toString());
+    animVal($('k2'),2.5,6,900,v=>v.toFixed(1)+' h');
+    $('cap').textContent='Each department requests its own closure — three blocks, overlapping disruption.';
+    $('b1').style.background='rgba(242,169,59,.25)';$('b2').style.background='';
+  }
+  gMode=m;setTimeout(()=>gAnim=false,1200);
+}
+$('b1').onclick=()=>{gAuto=0;setGMode(0)};
+$('b2').onclick=()=>{gAuto=0;setGMode(1)};
+setGMode(0);
+let _gt=0;setInterval(()=>{if(gAuto&&!document.hidden){_gt^=1;setGMode(_gt)}},4200);
+
+/* ── Counter ── */
+const triggered=new WeakSet();
+function doCounter(el){
+  if(triggered.has(el))return;triggered.add(el);
+  const target=parseFloat(el.dataset.t);
+  const suf=el.dataset.s||'';
+  if(isNaN(target))return;
+  animVal(el,0,target,1200,v=>(target%1===0?Math.round(v):v.toFixed(1))+suf);
+}
+
+/* ── Lenis ── */
+let lenis=null;
+if(!reduced()&&typeof Lenis!=='undefined'){
+  lenis=new Lenis({duration:1.15,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)),smooth:true,smoothTouch:false});
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const tgt=document.querySelector(a.getAttribute('href'));
+      if(tgt){e.preventDefault();lenis.scrollTo(tgt,{offset:-72,duration:1.4,easing:t=>1-Math.pow(1-t,4)})}
+    });
+  });
+}
+function raf(t){if(lenis)lenis.raf(t);requestAnimationFrame(raf)}
+requestAnimationFrame(raf);
+
+/* ── Scroll state ── */
+let scrollY=0,prevY=0,scrollDelta=0,sRaf=null,hh=0;
+function onSc(sy,d){
+  scrollY=sy;scrollDelta=d;
+  if(!sRaf)sRaf=requestAnimationFrame(()=>{doScroll();sRaf=null;prevY=scrollY});
+}
+if(lenis){lenis.on('scroll',({scroll,delta})=>onSc(scroll,delta))}
+else{window.addEventListener('scroll',()=>onSc(window.scrollY,window.scrollY-prevY),{passive:true})}
+
+function doScroll(){
+  updateSpb();updateNav();updateNavActiveSection();
+  if(!isTouch()&&!isMob())doParallax();
+  doTimeline();
+}
+
+function updateSpb(){
+  const max=document.documentElement.scrollHeight-window.innerHeight;
+  $('spb').style.width=clamp(max>0?(scrollY/max)*100:0,0,100)+'%';
+}
+
+/* ── Navbar Scroll & Motion System ── */
+const nav=$('nav'),nvi=$('nvi');
+let lastNavScrollY=0,lastScrollDir='none',navAccumDelta=0,isNavHidden=false;
+const NAV_TOP_ZONE=80;    // Always show navbar when within 80px of top
+const NAV_JITTER_THRESH=6; // Direction delta threshold in px to prevent jitter
+
+function updateNav(){
+  if(!nav)return;
+  const sy=scrollY;
+
+  // Glass transformation: blur & opacity intensify after initial scroll (35px)
+  if(nvi)nvi.classList.toggle('sc',sy>35);
+
+  // Near the top of the page: always show navbar
+  if(sy<=NAV_TOP_ZONE){
+    if(isNavHidden){
+      nav.classList.remove('nav-hidden');
+      isNavHidden=false;
+    }
+    lastNavScrollY=sy;
+    navAccumDelta=0;
+    lastScrollDir='none';
+    return;
+  }
+
+  const diff=sy-lastNavScrollY;
+
+  // Ignore microscopic scroll noise (< 1.5px)
+  if(Math.abs(diff)<1.5)return;
+
+  if(diff>0){
+    // Scrolling DOWN
+    if(lastScrollDir==='down'){
+      navAccumDelta+=diff;
+    } else {
+      lastScrollDir='down';
+      navAccumDelta=diff;
+    }
+    if(navAccumDelta>=NAV_JITTER_THRESH&&!isNavHidden){
+      nav.classList.add('nav-hidden');
+      isNavHidden=true;
+    }
+  } else if(diff<0){
+    // Scrolling UP: instant responsive return with spring settle
+    if(lastScrollDir==='up'){
+      navAccumDelta+=Math.abs(diff);
+    } else {
+      lastScrollDir='up';
+      navAccumDelta=Math.abs(diff);
+    }
+    if(navAccumDelta>=NAV_JITTER_THRESH&&isNavHidden){
+      nav.classList.remove('nav-hidden');
+      isNavHidden=false;
+    }
+  }
+
+  lastNavScrollY=sy;
+}
+
+/* ── Premium Navbar Navigation Motion System ── */
+const navContainer=$('nav-links');
+const navIndicator=$('nav-indicator');
+const navHoverBg=$('nav-hover-bg');
+const navItems=navContainer?Array.from(navContainer.querySelectorAll('.nl-item')):[];
+let activeNavSecId=null;
+let currentHoveredItem=null;
+
+function moveNavIndicatorTo(targetEl,animate=true){
+  if(!targetEl||!navIndicator||!navContainer){
+    if(navIndicator){
+      navIndicator.style.opacity='0';
+      navIndicator.style.transform=`${navIndicator.style.transform.split(' scaleX')[0]} scaleX(0)`;
+    }
+    return;
+  }
+  const cRect=navContainer.getBoundingClientRect();
+  const tRect=targetEl.getBoundingClientRect();
+  const left=tRect.left-cRect.left;
+  const width=tRect.width;
+
+  if(!animate){
+    navIndicator.style.transition='none';
+  }
+  navIndicator.style.transform=`translate3d(${left.toFixed(1)}px,0,0) scaleX(1)`;
+  navIndicator.style.width=`${width.toFixed(1)}px`;
+  navIndicator.style.opacity='1';
+
+  if(!animate){
+    void navIndicator.offsetWidth;
+    navIndicator.style.transition='';
+  }
+}
+
+function moveNavHoverBgTo(targetEl){
+  if(!targetEl||!navHoverBg||!navContainer){
+    if(navHoverBg){
+      navHoverBg.style.opacity='0';
+      navHoverBg.style.transform=`${navHoverBg.style.transform.split(' scale')[0]} scale(0.7)`;
+    }
+    return;
+  }
+  const cRect=navContainer.getBoundingClientRect();
+  const tRect=targetEl.getBoundingClientRect();
+  const left=tRect.left-cRect.left;
+  const width=tRect.width;
+
+  navHoverBg.style.transform=`translate3d(${left.toFixed(1)}px,0,0) scale(1)`;
+  navHoverBg.style.width=`${width.toFixed(1)}px`;
+  navHoverBg.style.opacity='1';
+}
+
+const navSectionIds=['problem','how','ai','features','tech'];
+const navSectionEls=navSectionIds.map(id=>$(id)).filter(Boolean);
+
+function updateNavActiveSection(){
+  if(!navContainer)return;
+  const vh=window.innerHeight;
+  const triggerY=vh*0.38;
+  let currentId=null;
+
+  if(scrollY<240){
+    currentId=null;
+  } else {
+    for(let i=navSectionEls.length-1;i>=0;i--){
+      const sec=navSectionEls[i];
+      const r=sec.getBoundingClientRect();
+      if(r.top<=triggerY&&r.bottom>60){
+        currentId=sec.id;
+        break;
+      }
+    }
+  }
+
+  if(currentId!==activeNavSecId){
+    activeNavSecId=currentId;
+    navItems.forEach(it=>{
+      const isActive=it.dataset.sec===activeNavSecId;
+      it.classList.toggle('active',isActive);
+    });
+
+    if(!currentHoveredItem){
+      const activeItem=navItems.find(it=>it.dataset.sec===activeNavSecId);
+      moveNavIndicatorTo(activeItem);
+    }
+  }
+}
+
+// Hover, cursor follow, and click press interactions
+if(!isTouch()&&navContainer){
+  navItems.forEach(item=>{
+    const textSpan=item.querySelector('.nl-text');
+
+    item.addEventListener('mouseenter',()=>{
+      currentHoveredItem=item;
+      moveNavHoverBgTo(item);
+      moveNavIndicatorTo(item);
+    });
+
+    item.addEventListener('mousemove',e=>{
+      const r=item.getBoundingClientRect();
+      const mx=clamp((e.clientX-(r.left+r.width/2))*0.12,-2.5,2.5);
+      const my=clamp((e.clientY-(r.top+r.height/2))*0.15,-1.5,1.5);
+      if(textSpan){
+        textSpan.style.transform=`translate3d(${mx.toFixed(1)}px,${(my-1).toFixed(1)}px,0) scale(1.025)`;
+      }
+    },{passive:true});
+
+    item.addEventListener('mouseleave',()=>{
+      if(textSpan){
+        textSpan.style.transform='';
+      }
+    });
+
+    item.addEventListener('mousedown',()=>{
+      if(textSpan){
+        textSpan.style.transform='translate3d(0,0,0) scale(0.97)';
+      }
+    });
+    item.addEventListener('mouseup',()=>{
+      if(textSpan){
+        setTimeout(()=>{
+          textSpan.style.transform='translate3d(0,-1px,0) scale(1.025)';
+        },80);
+      }
+    });
+  });
+
+  navContainer.addEventListener('mouseleave',()=>{
+    currentHoveredItem=null;
+    moveNavHoverBgTo(null);
+    const activeItem=navItems.find(it=>it.dataset.sec===activeNavSecId);
+    moveNavIndicatorTo(activeItem);
+  });
+}
+
+/* ── Cinematic Scroll Parallax & Hero Fade Out ── */
+function doParallax(){
+  hh=hh||($('hero').offsetHeight||window.innerHeight);
+  if(scrollY>hh*1.6)return;
+  const p=clamp(scrollY/hh,0,1);
+
+  // Hero container cinematic spatial transition (scale 1->0.96, opacity 1->0.25, blur 0->4px)
+  const hc=$('hcont');
+  if(hc){
+    const sc=1-p*0.04;
+    const op=Math.max(0,1-p*0.75);
+    const bl=p*4;
+    hc.style.transform=`translate3d(0,${(scrollY*-0.12).toFixed(1)}px,0) scale(${sc.toFixed(3)})`;
+    hc.style.opacity=op.toFixed(2);
+    hc.style.filter=bl>0.1?`blur(${bl.toFixed(1)}px)`:'none';
+  }
+
+  // Differential parallax depth layers:
+  const hd=$('h-hd');if(hd)hd.style.transform=`translate3d(0,${(scrollY*-0.23).toFixed(1)}px,0)`;
+  const desc=$('h-desc');if(desc)desc.style.transform=`translate3d(0,${(scrollY*-0.13).toFixed(1)}px,0)`;
+  const btns=$('h-btns');if(btns)btns.style.transform=`translate3d(0,${(scrollY*-0.08).toFixed(1)}px,0)`;
+  const st=$('hst');if(st)st.style.transform=`translate3d(0,${(scrollY*-0.03).toFixed(1)}px,0)`;
+
+  // Train visual & background image
+  const ht=$('htrain');if(ht)ht.style.transform=`translate3d(0,${(scrollY*-0.06).toFixed(1)}px,0)`;
+  const g=$('gbg');if(g)g.style.transform=`translate3d(0,${(scrollY*-0.04).toFixed(1)}px,0)`;
+  const bgi=$('bgimg');if(bgi)bgi.style.transform=`translate3d(0,${clamp(scrollY*-0.015,-16,0).toFixed(1)}px,0)`;
+}
+
+/* ── How It Works timeline ── */
+const howEl=$('how');
+function doTimeline(){
+  if(!howEl)return;
+  const r=howEl.getBoundingClientRect(),vh=window.innerHeight;
+  if(r.top>vh||r.bottom<0)return;
+  const p=clamp((vh-r.top)/(r.height+vh),0,1);
+  const tlf=$('tlf');if(tlf)tlf.style.height=(p*100)+'%';
+  const steps=document.querySelectorAll('.st-it');
+  const ac=Math.ceil(p*steps.length);
+  steps.forEach((s,i)=>s.classList.toggle('act',i<ac));
+}
+
+/* ── Intersection observers ── */
+const ioOpts={threshold:.1,rootMargin:'0px 0px -40px 0px'};
+
+// Reveal
+const rvIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.classList.add('in');
+  e.target.querySelectorAll('.ctr').forEach(doCounter);
+  if(e.target.classList.contains('ctr'))doCounter(e.target);
+  const va=e.target.querySelector('.va');
+  if(va)setTimeout(()=>va.classList.add('lit'),500);
+  rvIO.unobserve(e.target);
+}),ioOpts);
+
+// Text reveal
+const trIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.querySelectorAll('.trl').forEach((l,i)=>setTimeout(()=>l.classList.add('in'),i*90));
+  trIO.unobserve(e.target);
+}),{threshold:.08});
+
+// Stagger grid
+const sgIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.querySelectorAll('.sgc').forEach((c,i)=>{
+    const d=parseInt(c.style.getPropertyValue('--d')||i);
+    setTimeout(()=>c.classList.add('in'),d*85);
+  });
+  sgIO.unobserve(e.target);
+}),{threshold:.06});
+
+// Comparison rows
+const crIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.querySelectorAll('.cr').forEach((r,i)=>setTimeout(()=>r.classList.add('in'),i*80));
+  crIO.unobserve(e.target);
+}),{threshold:.08});
+
+// Feasibility
+const fiIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.querySelectorAll('.fit').forEach((f,i)=>setTimeout(()=>f.classList.add('in'),i*80));
+  fiIO.unobserve(e.target);
+}),{threshold:.08});
+
+// SHAP
+const shIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.querySelectorAll('.shr').forEach((r,i)=>{
+    setTimeout(()=>{
+      r.classList.add('in');
+      const b=r.querySelector('.bar');if(b)b.style.width=b.dataset.w+'%';
+      const sw=r.querySelector('.shap-sw');
+      if(sw)setTimeout(()=>{sw.style.transition='transform .65s ease';sw.style.transform='translateX(200%)'},350);
+    },i*110);
+  });
+  const ctr=e.target.querySelector('.ctr');if(ctr)doCounter(ctr);
+  shIO.unobserve(e.target);
+}),{threshold:.1});
+
+// Vision
+const visIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  const va=e.target.querySelector('.va');if(va)setTimeout(()=>va.classList.add('lit'),500);
+  visIO.unobserve(e.target);
+}),{threshold:.25});
+
+// Observe
+document.querySelectorAll('.rv').forEach(el=>rvIO.observe(el));
+document.querySelectorAll('h2').forEach(el=>trIO.observe(el));
+document.querySelectorAll('#hst,#prob,#ben,#feat,#tech-g').forEach(el=>sgIO.observe(el));
+document.querySelectorAll('table').forEach(el=>crIO.observe(el));
+document.querySelectorAll('#fcard,#feas').forEach(el=>fiIO.observe(el));
+document.querySelectorAll('#shap-card').forEach(el=>shIO.observe(el));
+document.querySelectorAll('#vis').forEach(el=>visIO.observe(el));
+
+const ctrIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){doCounter(e.target);ctrIO.unobserve(e.target)}}),{threshold:.5});
+document.querySelectorAll('.ctr').forEach(el=>ctrIO.observe(el));
+
+/* ── Card cursor glow ── */
+if(!isTouch()){
+  document.querySelectorAll('.card').forEach(card=>{
+    const glow=card.querySelector('.cgl');if(!glow)return;
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    },{passive:true});
+  });
+}
+
+/* ── 3D Tilt ── */
+if(!isTouch()&&!reduced()){
+  const MX=2;
+  document.querySelectorAll('.tlt').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const rx=clamp(((e.clientY-(r.top+r.height/2))/(r.height/2))*-MX,-MX,MX);
+      const ry=clamp(((e.clientX-(r.left+r.width/2))/(r.width/2))*MX,-MX,MX);
+      card.style.transform=`translateY(-7px) perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    },{passive:true});
+    card.addEventListener('mouseleave',()=>{card.style.transform=''});
+  });
+}
+
+/* ── Magnetic buttons ── */
+if(!isTouch()&&!reduced()){
+  document.querySelectorAll('.mb-btn').forEach(btn=>{
+    const MAX=7;
+    btn.addEventListener('mousemove',e=>{
+      const r=btn.getBoundingClientRect();
+      const dx=clamp((e.clientX-(r.left+r.width/2))*.32,-MAX,MAX);
+      const dy=clamp((e.clientY-(r.top+r.height/2))*.32,-MAX,MAX);
+      btn.style.transform=`translate(${dx}px,${dy}px) scale(1.03)`;
+    },{passive:true});
+    btn.addEventListener('mouseleave',()=>{btn.style.transform=''});
+  });
+}
+
+/* ── Cursor dot ── */
+if(!isTouch()){
+  const dot=$('cdot');
+  let cx=-100,cy=-100,tx=-100,ty=-100,cRaf=null;
+  document.addEventListener('mousemove',e=>{
+    tx=e.clientX;ty=e.clientY;dot.style.opacity='1';
+    if(!cRaf)cRaf=requestAnimationFrame(moveDot);
+  },{passive:true});
+  document.addEventListener('mouseleave',()=>{dot.style.opacity='0'});
+  function moveDot(){
+    cx+=(tx-cx)*.14;cy+=(ty-cy)*.14;
+    dot.style.left=cx+'px';dot.style.top=cy+'px';
+    cRaf=requestAnimationFrame(moveDot);
+  }
+  document.querySelectorAll('a,button,.card,.mb-btn').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{dot.style.transform='translate(-50%,-50%) scale(2.8)';dot.style.background='rgba(242,169,59,.45)'});
+    el.addEventListener('mouseleave',()=>{dot.style.transform='translate(-50%,-50%) scale(1)';dot.style.background='var(--acc)'});
+  });
+}
+
+/* ── Page intro sequence ── */
+function runIntro(){
+  if(reduced()){
+    document.querySelectorAll('.trl,.rv,.nv-stag,.dline,.hero-btn,#h-ey,.htw,#bgimg,#gbg').forEach(el=>el.classList.add('in'));
+    if(nav)nav.classList.remove('nav-init');
+    $('io').style.display='none';
+    return;
+  }
+  const ov=$('io');
+
+  // Opening logo reveal in loading screen: opacity: 0 -> 1, scale: 0.9 -> 1, blur: 6px -> 0
+  const iologo=$('io-logo');
+  if(iologo)setTimeout(()=>iologo.classList.add('in'),20);
+
+  // Smooth transition from overlay into hero
+  setTimeout(()=>ov.style.opacity='0',450);
+  setTimeout(()=>ov.style.display='none',950);
+
+  // 1. Background image softly fades in
+  const bgi=$('bgimg');if(bgi)bgi.classList.add('in');
+
+  // 2. Grid background softly fades in
+  setTimeout(()=>{const g=$('gbg');if(g)g.classList.add('in')},120);
+
+  // Navbar spring entrance & fast cohesive stagger
+  if(nav){
+    setTimeout(()=>nav.classList.remove('nav-init'),60);
+    setTimeout(()=>{const l=$('nav-logo');if(l)l.classList.add('in')},100);
+    setTimeout(()=>{const t=$('nav-title');if(t)t.classList.add('in')},150);
+    const links=document.querySelectorAll('#nav-links .nl-item');
+    links.forEach((lnk,i)=>setTimeout(()=>lnk.classList.add('in'),190+i*35));
+    setTimeout(()=>{const cta=$('nav-cta');if(cta)cta.classList.add('in');updateNavActiveSection();},190+links.length*35+40);
+  }
+
+  // 3. Eyebrow text enters from below (opacity 0 -> 1, translateY 12px -> 0, letter-spacing)
+  setTimeout(()=>{
+    const e=$('h-ey');
+    if(e){
+      e.classList.add('in');
+      setTimeout(()=>e.classList.add('shimmer'),450);
+    }
+  },200);
+
+  // 4. Main headline reveals line by line with blur unmask
+  setTimeout(()=>{const l1=$('hl-1');if(l1)l1.classList.add('in')},360);
+  setTimeout(()=>{
+    const l2=$('hl-2');
+    if(l2){
+      l2.classList.add('in');
+      // Amber line light sweep across text once
+      setTimeout(()=>l2.classList.add('shimmer'),500);
+    }
+  },480);
+  setTimeout(()=>{const l3=$('hl-3');if(l3)l3.classList.add('in')},600);
+
+  // 5. Description fades upward line by line with subtle blur
+  setTimeout(()=>{const d1=$('hdl-1');if(d1)d1.classList.add('in')},720);
+  setTimeout(()=>{const d2=$('hdl-2');if(d2)d2.classList.add('in')},800);
+  setTimeout(()=>{const d3=$('hdl-3');if(d3)d3.classList.add('in')},880);
+
+  // 6. CTA buttons appear with short stagger
+  setTimeout(()=>{const b1=$('cta-d');if(b1)b1.classList.add('in')},960);
+  setTimeout(()=>{const b2=$('cta-h');if(b2)b2.classList.add('in')},1040);
+
+  // 7. Statistics cards appear last
+  setTimeout(()=>{
+    const cards=$('hst')?$('hst').querySelectorAll('.sgc'):[];
+    cards.forEach((c,i)=>setTimeout(()=>{
+      c.classList.add('in');
+      const ctr=c.querySelector('.ctr');if(ctr)doCounter(ctr);
+    },i*85));
+  },1120);
+
+  // 8. Railway visual enters smoothly after content
+  setTimeout(()=>{const ht=$('htrain');if(ht)ht.classList.add('in')},1300);
+}
+
+/* ── Hero Cinematic Mouse Depth & Spring Smoothing ── */
+let hmx=0,hmy=0,chmx=0,chmy=0;
+const heroEl=$('hero');
+if(!isTouch()&&!isMob()&&!reduced()&&heroEl){
+  heroEl.addEventListener('mousemove',e=>{
+    const r=heroEl.getBoundingClientRect();
+    hmx=clamp((e.clientX-(r.left+r.width/2))/(r.width/2),-1,1);
+    hmy=clamp((e.clientY-(r.top+r.height/2))/(r.height/2),-1,1);
+  },{passive:true});
+
+  heroEl.addEventListener('mouseleave',()=>{
+    hmx=0;hmy=0;
+  });
+
+  function updateHeroMouse(){
+    chmx+=(hmx-chmx)*0.07;
+    chmy+=(hmy-chmy)*0.07;
+
+    // Headline individual line parallax (Smarter Blocks: 2px, Safer Assets: 3px, Smoother Operations: 1.5px)
+    const l1=$('hlw-1'),l2=$('hlw-2'),l3=$('hlw-3');
+    if(l1)l1.style.transform=`translate3d(${(chmx*2).toFixed(2)}px,${(chmy*2).toFixed(2)}px,0)`;
+    if(l2)l2.style.transform=`translate3d(${(chmx*3).toFixed(2)}px,${(chmy*3).toFixed(2)}px,0)`;
+    if(l3)l3.style.transform=`translate3d(${(chmx*1.5).toFixed(2)}px,${(chmy*1.5).toFixed(2)}px,0)`;
+
+    // Floating particles subtle counter-drift
+    document.querySelectorAll('.pt-dot').forEach((d,i)=>{
+      const factor=i%2===0?2.8:-2.8;
+      d.style.transform=`translate3d(${(chmx*factor).toFixed(1)}px,${(chmy*factor).toFixed(1)}px,0)`;
+    });
+
+    // Background & grid subtle drift (near top only)
+    if(scrollY<80){
+      const g=$('gbg'),ba=$('bga');
+      if(g)g.style.transform=`translate3d(${(chmx*1.8).toFixed(1)}px,${(chmy*1.8).toFixed(1)}px,0)`;
+      if(ba)ba.style.transform=`translate3d(${(chmx*3.2).toFixed(1)}px,${(chmy*3.2).toFixed(1)}px,0)`;
+    }
+
+    requestAnimationFrame(updateHeroMouse);
+  }
+  requestAnimationFrame(updateHeroMouse);
+}
+
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',runIntro)}
+else{runIntro()}
+
+window.addEventListener('resize',()=>{hh=0},{passive:true});
+</script>
+</body>
+</html>
